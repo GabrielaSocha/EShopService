@@ -8,7 +8,7 @@ public class CreditCardServiceTest
     public void ValidateCard_ShouldReturnFalse_WhenTooShort()
     {
         string cardNumber = "123456789012"; // 12 cyfr - za krótka
-        bool result = ValidateCardLength(cardNumber);
+        bool result = ValidateCard(cardNumber);
         Assert.False(result);
     }
 
@@ -52,15 +52,6 @@ public class CreditCardServiceTest
         Assert.True(result);
     }
 
-    private bool ValidateCardLength(string cardNumber)
-    {
-        string cleanedNumber = cardNumber.Replace(" ", "").Replace("-", "");
-        return cleanedNumber.Length >= 13 && cleanedNumber.Length <= 19;
-    }
 
-    private bool ValidateCardFormat(string cardNumber)
-    {
-        return Regex.IsMatch(cardNumber, @"^[0-9\-\s]+$");
-    }
-
+    
 }
