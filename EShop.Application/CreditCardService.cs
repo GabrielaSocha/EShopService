@@ -6,7 +6,7 @@ namespace EShop.Application
 {
     public class CreditCardService
     {
-        public CreditCardProvider ValidateCard(string cardNumber)
+        public CreditCardProvider? ValidateCard(string cardNumber)
         {
             string cleanedNumber = Regex.Replace(cardNumber, "[^0-9]", "");
 
