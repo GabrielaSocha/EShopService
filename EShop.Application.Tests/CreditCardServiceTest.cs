@@ -1,89 +1,101 @@
-using EShop.Application;
-using EShop.Domain.Enums;
+using EShop.Application.Services;
 using EShop.Domain.Exceptions;
-using Xunit;
+using EShop.Domain;
 
-public class CreditCardServiceTest
+namespace EShop.Application.Tests.Services
 {
-    private readonly CreditCardService _service = new();
-
-    [Fact]
-    public void ValidateCard_ShouldReturnVisa()
+    public class CreditCardServiceTest
     {
-        Assert.Equal(CreditCardProvider.Visa, _service.ValidateCard("4123456789012"));
-    }
+        [Fact]
+        public void ValidateCard_CheckCardCorrectLength_ReturnTrue()
+        {
+            // Arrange
+            var creditCardService = new CreditCardService();
+            string cardNumber = "349779658312797";
 
-    [Fact]
-    public void ValidateCard_ShouldReturnMasterCard()
-    {
-        Assert.Equal(CreditCardProvider.MasterCard, _service.ValidateCard("5123456789012345"));
-    }
+            // Act
+            var result = creditCardService.ValidateCardNumber(cardNumber);
 
-    [Fact]
-    public void ValidateCard_ShouldReturnAmericanExpress()
-    {
-        Assert.Equal(CreditCardProvider.AmericanExpress, _service.ValidateCard("371234567890123"));
-    }
+            // Assert
+            Assert.True(result);
+        }
 
-    [Fact]
-    public void ValidateCard_ShouldReturnDiscover()
-    {
-        Assert.Equal(CreditCardProvider.Discover, _service.ValidateCard("6011123456789012"));
-    }
 
-    [Fact]
-    public void ValidateCard_ShouldReturnJCB()
-    {
-        Assert.Equal(CreditCardProvider.JCB, _service.ValidateCard("3528123456789012"));
-    }
+        [Fact]
+        public void ValidateCard_CheckExceptionsTooShortNumber_ReturnTrue()
+        {
+            // Arrange
+            var creditCardService = new CreditCardService();
+            string cardNumber = "1212";
 
-    [Fact]
-    public void ValidateCard_ShouldReturnDinersClub()
-    {
-        Assert.Equal(CreditCardProvider.DinersClub, _service.ValidateCard("30569309025904"));
-    }
+            // Act && Assert
+            Assert.Throws<CardNumberTooShortException>(() => creditCardService.ValidateCardNumber(cardNumber));
+        }
 
-    [Fact]
-    public void ValidateCard_ShouldReturnMaestro()
-    {
-        Assert.Equal(CreditCardProvider.Maestro, _service.ValidateCard("5018123456789012"));
-    }
+        [Fact]
+        public void ValidateCard_CheckExceptionsTooLongNumber_ReturnTrue()
+        {
+            // Arrange
+            var creditCardService = new CreditCardService();
+            string cardNumber = "3497 7965 8312 797 3497 7965 8312 797";
 
-    [Fact]
-    public void ValidateCard_ShouldThrowCardNumberInvalidException()
-    {
-        Assert.Throws<CardNumberInvalidException>(() => _service.ValidateCard("9999999999999999"));
-    }
+            // Act && Assert
+            Assert.Throws<CardNumberTooLongException>(() => creditCardService.ValidateCardNumber(cardNumber));
+        }
 
-    // --- Nowe testy d³ugoœci karty ---
-    [Fact]
-    public void ValidateCard_ShouldThrowException_WhenTooShort()
-    {
-        Assert.Throws<CardNumberTooShortException>(() => _service.ValidateCard("123456789012")); // 12 cyfr
-    }
+        [Theory]
+        [InlineData("3497 7965 8312 797")]
+        [InlineData("345-470-784-783-010")]
+        [InlineData("378523393817437")]
+        [InlineData("4024-0071-6540-1778")]
+        [InlineData("4532 2080 2150 4434")]
+        [InlineData("4532289052809181")]
+        [InlineData("5530016454538418")]
+        [InlineData("5551561443896215")]
+        [InlineData("5131208517986691")]
+        public void ValidateCard_CheckCardValidator_ReturnTrue(string cardNumber)
+        {
+            // Arrange
+            var creditCardService = new CreditCardService();
 
-    [Fact]
-    public void ValidateCard_ShouldThrowException_WhenTooLong()
-    {
-        Assert.Throws<CardNumberTooLongException>(() => _service.ValidateCard("123456789012345678901")); // 21 cyfr
-    }
+            // Act
+            var result = creditCardService.ValidateCardNumber(cardNumber);
 
-    // --- Nowe testy formatu karty ---
-    [Fact]
-    public void ValidateCard_ShouldAllowSpaces()
-    {
-        Assert.Equal(CreditCardProvider.Visa, _service.ValidateCard("4123 4567 8901 2"));
-    }
+            // Assert
+            Assert.True(result);
+        }
 
-    [Fact]
-    public void ValidateCard_ShouldAllowDashes()
-    {
-        Assert.Equal(CreditCardProvider.MasterCard, _service.ValidateCard("5123-4567-8901-2345"));
-    }
+        [Theory]
+        [InlineData("3497 7965 8312 797", "American Express")]
+        [InlineData("345-470-784-783-010", "American Express")]
+        [InlineData("378523393817437", "American Express")]
+        [InlineData("4024-0071-6540-1778", "Visa")]
+        [InlineData("4532 2080 2150 4434", "Visa")]
+        [InlineData("4532289052809181", "Visa")]
+        [InlineData("5530016454538418", "MasterCard")]
+        [InlineData("5551561443896215", "MasterCard")]
+        [InlineData("5131208517986691", "MasterCard")]
+        public void ValidateCard_CheckGetCardType_ReturnTrue(string cardNumber, string cardType)
+        {
+            // Arrange
+            var creditCardService = new CreditCardService();
 
-    [Fact]
-    public void ValidateCard_ShouldAllowMixedSeparators()
-    {
-        Assert.Equal(CreditCardProvider.Visa, _service.ValidateCard("41-23 45-67 89-01 2"));
+            // Act
+            var result = creditCardService.GetCardType(cardNumber);
+
+            // Assert
+            Assert.Equal(result, cardType);
+        }
+
+        [Fact]
+        public void ValidateCard_CardNumberInvalidException_ReturnTrue()
+        {
+            // Arrange
+            var creditCardService = new CreditCardService();
+            string cardNumber = "3574-7338-8857-5590";
+
+            // Act && Assert
+            Assert.Throws<CardNumberInvalidException>(() => creditCardService.GetCardType(cardNumber));
+        }
     }
 }

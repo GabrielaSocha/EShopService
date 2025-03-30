@@ -11,10 +11,6 @@ namespace EShop.Domain.Enums
     {
         Visa,
         MasterCard,
-        AmericanExpress,
-        Discover,
-        JCB,
-        DinersClub,
-        Maestro
+        AmericanExpress
     }
 }
