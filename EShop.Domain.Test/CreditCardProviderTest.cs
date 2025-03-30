@@ -35,13 +35,13 @@ public class CreditCardProviderTest
     [Fact]
     public void ValidateCard_ShouldDetectAmericanExpress()
     {
-        Assert.Equal(CreditCardProvider.AmericanExpress, _service.ValidateCard("312345678901234"));
+        Assert.Equal(CreditCardProvider.AmericanExpress, _service.ValidateCard("378523393817437"));
     }
 
     [Fact]
-    public void ValidateCard_ShouldDetectUnknown()
+    public void ValidateCard_ShouldThrowCardNumberInvalidException()
     {
-        Assert.Equal(CreditCardProvider.Unknown, _service.ValidateCard("9999999999999999"));
+        Assert.Throws<CardNumberInvalidException>(() => _service.ValidateCard("9999999999999999"));
     }
 
     [Fact]
