@@ -39,9 +39,9 @@ public class CreditCardProviderTest
     }
 
     [Fact]
-    public void ValidateCard_ShouldDetectUnknown()
+    public void ValidateCard_ShouldThrowCardNumberInvalidException()
     {
-        Assert.Equal(CreditCardProvider.Unknown, _service.ValidateCard("9999999999999999"));
+        Assert.Throws<CardNumberInvalidException>(() => _service.ValidateCard("9999999999999999"));
     }
 
     [Fact]

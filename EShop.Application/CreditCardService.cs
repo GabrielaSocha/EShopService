@@ -29,7 +29,7 @@ namespace EShop.Application
             if (Regex.IsMatch(number, "^(?:352[89]|35[3-8][0-9])[0-9]{12}$")) return CreditCardProvider.JCB;
             if (Regex.IsMatch(number, "^3(?:0[0-5]|[68][0-9])[0-9]{11}$")) return CreditCardProvider.DinersClub;
             if (Regex.IsMatch(number, "^(?:50|5[6-9]|6[0-9])[0-9]{10,17}$")) return CreditCardProvider.Maestro;
-            return CreditCardProvider.Unknown;
+            throw new CardNumberInvalidException();
         }
     }
 }
