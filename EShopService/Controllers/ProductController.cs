@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿using EShop.Application.Services;
+using EShop.Domain.Models;
+using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EShopService.Controllers
 {
@@ -8,36 +10,52 @@ namespace EShopService.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        // GET: api/<ProductController>
+        private readonly IProductService _productService;
+
+        public ProductController(IProductService productService)
+        {
+            _productService = productService;
+        }
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<ActionResult<IEnumerable<Product>>> Get()
         {
-            return new string[] { "value1", "value2" };
+            var products = await _productService.GetAllProductsAsync();
+            return Ok(products);
         }
 
-        // GET api/<ProductController>/5
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<ActionResult<Product>> Get(int id)
         {
-            return "value";
+            var product = await _productService.GetProductByIdAsync(id);
+            if (product == null)
+                return NotFound();
+
+            return Ok(product);
         }
 
-        // POST api/<ProductController>
         [HttpPost]
-        public void Post([FromBody]string value)
+        public async Task<ActionResult> Post([FromBody] Product product)
         {
+            await _productService.AddProductAsync(product);
+            return CreatedAtAction(nameof(Get), new { id = product.id }, product);
         }
 
-        // PUT api/<ProductController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public async Task<ActionResult> Put(int id, [FromBody] Product product)
         {
+            if (id != product.id)
+                return BadRequest("Mismatched product ID");
+
+            await _productService.UpdateProductAsync(product);
+            return NoContent();
         }
 
-        // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
+            await _productService.DeleteProductAsync(id);
+            return NoContent();
         }
     }
 }
