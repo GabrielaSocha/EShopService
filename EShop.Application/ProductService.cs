@@ -1,42 +1,51 @@
 ﻿using EShop.Domain.Models;
 using EShop.Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace EShop.Application.Services
+namespace EShop.Application
 {
     public class ProductService : IProductService
     {
-        private readonly IProductRepository _productRepository;
-
-        public ProductService(IProductRepository productRepository)
+        private IProductRepository _repository;
+        public ProductService(IProductRepository repository)
         {
-            _productRepository = productRepository;
+            _repository = repository;
         }
 
-        public async Task<IEnumerable<Product>> GetAllProductsAsync()
+        public async Task<List<Product>> GetAllAsync()
         {
-            return await _productRepository.GetAllAsync();
+            var result = await _repository.GetAllProductAsync();
+
+            return result;
         }
 
-        public async Task<Product?> GetProductByIdAsync(int id)
+        public async Task<Product> GetAsync(int id)
         {
-            return await _productRepository.GetByIdAsync(id);
+            var result = await _repository.GetProductAsync(id);
+
+            return result;
         }
 
-        public async Task AddProductAsync(Product product)
+        public async Task<Product> UpdateAsync(Product product)
         {
-            await _productRepository.AddAsync(product);
+            var result = await _repository.UpdateProductAsync(product);
+
+            return result;
         }
 
-        public async Task UpdateProductAsync(Product product)
+        public async Task<Product> AddAsync(Product product)
         {
-            await _productRepository.UpdateAsync(product);
-        }
+            var result = await _repository.AddProductAsync(product);
 
-        public async Task DeleteProductAsync(int id)
+            return result;
+        }
+        public Product Add(Product product)
         {
-            await _productRepository.DeleteAsync(id);
+            var result = _repository.AddProductAsync(product).Result;
+
+            return result;
         }
     }
 }

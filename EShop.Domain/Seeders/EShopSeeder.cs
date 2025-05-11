@@ -1,62 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EShop.Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using EShop.Domain.Models;
+using EShop.Domain.Repositories;
 
-namespace EShop.Domain.Seeders;
-public static class EShopSeeder
+namespace EShop.Domain.Seeders
 {
-    public static void Seed(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<Category>().HasData(
-            new Category { Id = 1, Name = "Electronics" },
-            new Category { Id = 2, Name = "Books" },
-            new Category { Id = 3, Name = "Clothing" }
-        );
 
-        modelBuilder.Entity<Product>().HasData(
-            new Product
+    public class EShopSeeder : IEShopSeeder
+    {
+        private readonly DataContext _context;
+
+        public EShopSeeder(DataContext context)
+        {
+            _context = context;
+        }
+
+        public async Task Seed()
+        {
+            // Seedowanie kategorii
+            if (!_context.Categories.Any())
             {
-                Id = 1,
-                Name = "Wireless Mouse",
-                Ean = "1234567890123",
-                Price = 29.99m,
-                Stock = 100,
-                Sku = "MOUSE123",
-                CategoryId = 1,
-                Deleted = false,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.NewGuid()
-            },
-            new Product
-            {
-                Id = 2,
-                Name = "Programming Book",
-                Ean = "9876543210987",
-                Price = 49.99m,
-                Stock = 50,
-                Sku = "BOOK456",
-                CategoryId = 2,
-                Deleted = false,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.NewGuid()
-            },
-            new Product
-            {
-                Id = 3,
-                Name = "T-Shirt",
-                Ean = "3216549876543",
-                Price = 19.99m,
-                Stock = 200,
-                Sku = "TSHIRT789",
-                CategoryId = 3,
-                Deleted = false,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.NewGuid()
+                var categories = new List<Category>
+                {
+                    new Category { Name = "Toys" },
+                    new Category { Name = "Electronics" },
+                    new Category { Name = "Books" }
+                };
+
+                await _context.Categories.AddRangeAsync(categories);
+                await _context.SaveChangesAsync();
             }
-        );
+
+            // Seedowanie produktów
+            if (!_context.Products.Any())
+            {
+                var toys = new List<Product>
+                {
+                    new Product { Name = "Cobi", Ean = "1234", Sku = "SKU001" },
+                    new Product { Name = "Duplo", Ean = "431", Sku = "SKU002" },
+                    new Product { Name = "Lego", Ean = "12212", Sku = "SKU003" }
+                };
+
+                await _context.Products.AddRangeAsync(toys);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

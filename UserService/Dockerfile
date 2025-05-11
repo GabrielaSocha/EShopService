@@ -12,21 +12,19 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["EShopService/EShopService.csproj", "EShopService/"]
-COPY ["EShop.Application/EShop.Application.csproj", "EShop.Application/"]
-COPY ["EShop.Domain/EShop.Domain.csproj", "EShop.Domain/"]
-RUN dotnet restore "./EShopService/EShopService.csproj"
+COPY ["UserService/UserService.csproj", "UserService/"]
+RUN dotnet restore "./UserService/UserService.csproj"
 COPY . .
-WORKDIR "/src/EShopService"
-RUN dotnet build "./EShopService.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/UserService"
+RUN dotnet build "./UserService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./EShopService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./UserService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "EShopService.dll"]
+ENTRYPOINT ["dotnet", "UserService.dll"]

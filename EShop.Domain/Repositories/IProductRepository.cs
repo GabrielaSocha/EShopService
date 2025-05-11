@@ -6,10 +6,13 @@ namespace EShop.Domain.Repositories
 {
     public interface IProductRepository
     {
-        Task<IEnumerable<Product>> GetAllAsync();
-        Task<Product?> GetByIdAsync(int id);
-        Task AddAsync(Product product);
-        Task UpdateAsync(Product product);
-        Task DeleteAsync(int id);
+        #region Product
+        Task<Product> GetProductAsync(int id);
+        Task<Product> AddProductAsync(Product product);
+        Task<Product> UpdateProductAsync(Product user);
+        Task<List<Product>> GetAllProductAsync();
+        #endregion
+
     }
+
 }

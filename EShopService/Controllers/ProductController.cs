@@ -1,8 +1,9 @@
-﻿using EShop.Application.Services;
+﻿using EShop.Application;
 using EShop.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace EShopService.Controllers
 {
@@ -10,52 +11,67 @@ namespace EShopService.Controllers
     [ApiController]
     public class ProductController : ControllerBase
     {
-        private readonly IProductService _productService;
-
+        private IProductService _productService;
         public ProductController(IProductService productService)
         {
             _productService = productService;
         }
 
+        // GET: api/<ProductController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> Get()
+        public async Task<ActionResult> Get()
         {
-            var products = await _productService.GetAllProductsAsync();
-            return Ok(products);
+            var result = await _productService.GetAllAsync();
+            return Ok(result);
         }
 
+        // GET api/<ProductController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> Get(int id)
+        public async Task<ActionResult> Get(int id)
         {
-            var product = await _productService.GetProductByIdAsync(id);
-            if (product == null)
+            var result = await _productService.GetAsync(id);
+            if (result == null)
+            {
                 return NotFound();
+            }
 
-            return Ok(product);
+            return Ok(result);
         }
 
+        // POST api/<ProductController>
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] Product product)
         {
-            await _productService.AddProductAsync(product);
-            return CreatedAtAction(nameof(Get), new { id = product.id }, product);
+            var result = await _productService.AddAsync(product);
+
+            return Ok(result);
         }
 
+        // PUT api/<ProductController>/5
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(int id, [FromBody] Product product)
         {
-            if (id != product.id)
-                return BadRequest("Mismatched product ID");
+            var result = await _productService.UpdateAsync(product);
 
-            await _productService.UpdateProductAsync(product);
-            return NoContent();
+            return Ok(result);
         }
 
+        // DELETE api/<ProductController>/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            await _productService.DeleteProductAsync(id);
-            return NoContent();
+            var product = await _productService.GetAsync(id);
+            product.Deleted = true;
+            var result = await _productService.UpdateAsync(product);
+
+            return Ok(result);
+        }
+        [HttpPatch]
+        public ActionResult Add([FromBody] Product product)
+        {
+            var result = _productService.Add(product);
+
+            return Ok(result);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using EShop.Application.Services;
+﻿using EShop.Application;
 using EShop.Domain.Exceptions;
 using Xunit;
 

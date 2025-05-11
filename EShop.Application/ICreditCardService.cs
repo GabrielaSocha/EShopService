@@ -2,7 +2,7 @@
 using EShop.Domain.Exceptions;
 using System.Text.RegularExpressions;
 
-namespace EShop.Application.Services
+namespace EShop.Application
 {
     public interface ICreditCardService
     {
